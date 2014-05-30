@@ -1,0 +1,14 @@
+Package: clustMD
+Type: Package
+Title: Model based clustering for mixed data.
+Version: 1.0
+Date: 2014-05-30
+Author: Damien McParland
+Maintainer: Damien McParland <damien.mcparland@ucd.ie>
+Description: Model-based clustering of mixed data (i.e. data which consist of continuous, binary, ordinal or nominal variables) using a parsimonious mixture of latent Gaussian variable models.
+Imports: tmvtnorm, mvtnorm, truncnorm, MASS, mclust, msm
+License: GPL-2
+Packaged: 2014-06-12 11:19:06 UTC; clairegormleyoldmac
+NeedsCompilation: no
+Repository: CRAN
+Date/Publication: 2014-06-12 15:14:48
