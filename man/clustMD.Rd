@@ -8,7 +8,8 @@
 	A function which fits the clustMD model to a data set consisting of any combination of continuous, binary, ordinal and nominal variables.
 }
 \usage{
-clustMD(X, G, CnsIndx, OrdIndx, Nnorms, MaxIter, model, store.params = FALSE)
+clustMD(X, G, CnsIndx, OrdIndx, Nnorms, MaxIter, model, store.params = FALSE,
+ scale, startCL="kmeans")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -36,6 +37,15 @@ clustMD(X, G, CnsIndx, OrdIndx, Nnorms, MaxIter, model, store.params = FALSE)
   \item{store.params}{
 	A logical variable indicating if the parameter estimates at each iteration should be saved and returned by the clustMD function.
 }
+
+  \item{scale}{
+	A logical variable indicating if the continuous variables should be standardised.
+}
+
+  \item{startCL}{
+	A string indicating which clustering method should be used to initialise the (MC)EM algorithm. This may be one of "kmeans" (K means clustering), "hclust" (hierarchical clustering), "mclust" (finite mixture of Gaussian distributions) or "random" (random cluster allocation).
+}
+
 }
 \details{
 Model-based clustering of mixed data using a parsimonious mixture of latent Gaussian variables.
@@ -49,7 +59,7 @@ A list is returned:
   \item{Lambda }{A G x D matrix of volume parameters corresponding to each observed or latent dimension for each cluster.}
   \item{Sigma}{A D x D x G array of the covariance matrices for each cluster.}
   \item{BIChat}{The estimated Bayesian information criterion for the model fitted.}
-  \item{paramlist}{If store.params is true then paramlist is a list of the stored parameter values in the order given above with the saved estimated likelihood values in last position.}
+  \item{paramlist}{If store.params is TRUE then paramlist is a list of the stored parameter values in the order given above with the saved estimated likelihood values in last position.}
 }
 \references{
 	McParland, D. and Gormley, I.C. (2014). Model based clustering for mixed data: clustMD. Technical report, University College Dublin.
@@ -83,7 +93,7 @@ Y[, 12] <- Yekg
 
 \dontrun{
 	res <- clustMD(X=Y, G=3, CnsIndx=8, OrdIndx=11, Nnorms=20000, 
-	MaxIter=100, model="EVI", store.params=FALSE)
+	MaxIter=500, model="EVI", store.params=FALSE, scale=TRUE, startCL="kmeans")
 }
 
 }
