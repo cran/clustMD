@@ -1,182 +1,86 @@
-clustMD <-
-function(X, G, CnsIndx, OrdIndx, Nnorms, MaxIter, model, store.params=FALSE, scale=FALSE, startCL="kmeans"){
-    # Controls
-    Y <- as.matrix(X)
-    N <- nrow(Y)
-    J <- ncol(Y)
-    
-    ### Scale continuous data
-    if(scale){
-      if(CnsIndx > 0)
-        Y[, 1:CnsIndx] <- scale(Y[, 1:CnsIndx])
-    } # if
-    
-    # Number of levels foon each item
-    K <- apply(Y, 2, max)
-    if(CnsIndx > 0) K[1:CnsIndx] <- NA
-    
-    # Dimension of latent space
-    D <- J
-    if(J > OrdIndx)
-      D <- OrdIndx + sum(K[(OrdIndx+1):J] - 1)
-    
-    # Which dimensions correspond to each item
-    if(J > OrdIndx){
-      nom.ind.Z<-vector("list", J-OrdIndx)
-      for(j in 1:(J-OrdIndx)){
-        if(j==1){
-          start <- OrdIndx + 1
-        }else{
-          start <- OrdIndx + sum(K[(OrdIndx+1):(OrdIndx+j-1)]-1) + 1
-        }
-        finish <- start + K[OrdIndx+j] - 2
-        nom.ind.Z[[j]] <-c(start:finish) 
-      } # j
-    } # if
-    
-    
-    ### Initial Values
-    
-    
-    ### Estimated starting values
-    ## Expected value of latent data
-    Ez <- array(NA, c(N, D, G))
-    for(g in 1:G) Ez[, 1:J , g] <- Y
-    
-    if(OrdIndx > CnsIndx){
-      perc.cut <- perc.cutoffs(CnsIndx, OrdIndx, Y, N)
-      zlimits <- array(NA, c(N, J, 2))
-      zlimits[, 1:CnsIndx, 1] <- -Inf
-      zlimits[, 1:CnsIndx, 2] <- Inf
-      for(j in (CnsIndx+1):OrdIndx){
-        for(k in 1:K[j]){
-          zlimits[Y[,j]==k, j, 1] <- perc.cut[[j]][k]
-          zlimits[Y[,j]==k, j, 2] <- perc.cut[[j]][k+1]
-        }
-      }
-    }else{
-      perc.cut <- list()
-      zlimits <- array(NA, c(N, J, 2))
-    }
-    
-    Zstart <- function(Kj, y){
-      new.z <- rep( 0, (Kj - 1) )  
-      if (y==1){
-        new.z <- rtnorm((Kj - 1), mean=0, sd=1, upper=0)
-      }else{
-        new.z[-(y-1)] <- rnorm((Kj - 2), mean=0, sd=1)
-        new.z[(y-1)] <- rtnorm(1, mean=0, sd=1,lower=max(new.z))
-      }
-      new.z
-    }
-    
-    Zinit <- matrix(NA, N, D)
-    Zinit[, 1:OrdIndx] <- Y[, 1:OrdIndx]
-    if(J > OrdIndx){
-      for (j in (OrdIndx+1):J){
-        for(i in 1:N){
-          Zinit[i, nom.ind.Z[[j-OrdIndx]]] <- Zstart(K[j], Y[i, j])
-        }# i
-      }# j
-    }
-    
-    # initial clustering
-    if(startCL == "kmeans"){
-      if(CnsIndx > 0){
-        ind <- kmeans(Y[, 1:CnsIndx], G)$cl
-      }else{
-        ind <- kmeans(Y, G)$cl
-      }
-    }else if(startCL == "hclust"){
-#       temp <- hclust(dist(Y[, 1:CnsIndx]))
-      temp <- hclust(dist(Y))
-      ind <- cutree(temp, G)
-#       print(table(ind, ind.true))
-    }else if(startCL == "mclust"){
-#       ind <- Mclust(Y[, 1:CnsIndx], G, model)$cl
-      ind <- Mclust(Y, G, model)$cl
-#       print(table(ind, ind.true))
-    }else if(startCL == "random"){
-      ind <- sample(1:G, N, replace=TRUE)
-#       print(table(ind, ind.true))
-    }
-    # mixing weights
-    pi.vec <- table(ind)/N
-    
-    # mean
-    mu <- matrix(NA, D, G)
-    for(g in 1:G)
-      mu[, g] <- apply(Zinit[ind==g, ], 2, mean)
-    
-    # Covaraince
-    Sigma <- array(NA, c(D, D, G))
-    for(g in 1:G)
-      Sigma[, , g] <- diag(D)
-    
-    a <- matrix(1, G, D)  
-    
-    ## Storage
-    if(store.params==TRUE){
-      ind.store <- matrix(NA, N, MaxIter)
-      Ez.store <- array(NA, c(N, D, G, MaxIter))
-      tau.store <- array(NA, c(N, G, MaxIter))
-      mu.store <- array(NA, c(D, G, MaxIter))
-      lambda.store <- array(NA, c(G, D, MaxIter))
-      a.store <- array(NA, c(G, D, MaxIter))
-      likeStore <- rep(NA, MaxIter)
-      if(J > OrdIndx) probs.nom.store<- array(NA, c(J-OrdIndx, max(K[(OrdIndx+1):J]), G, MaxIter))
-    }
-    
-    ### EM Loop
-    for(iter in 1:MaxIter){  
-      if(iter%%10==0) print(iter)
-      
-      # Standard normal deviates for MC approximation
-      if(J > OrdIndx) norms <- mvrnorm(Nnorms, mu=rep(0, max(K[(OrdIndx+1):J])-1), Sigma=diag(max(K[(OrdIndx+1):J])-1))
-      
-      if(J > CnsIndx){
-        # Z moments
-        temp.z <- z.moments(D, G, N, CnsIndx, OrdIndx, zlimits, mu, Sigma, Y, J, K, norms, nom.ind.Z)
-        Ez <- temp.z[[1]]
-        S <- temp.z[[2]]
-        probs.nom <- temp.z[[3]]
-        S2 <- temp.z[[4]]
-      }
-      
-      # E-step
-      temp.E <- E.step(N, G, pi.vec, Y, OrdIndx, CnsIndx, D, perc.cut, mu, Sigma, Ez, J, probs.nom, K)
-      tau <- temp.E[[1]]
-      Elz <- temp.E[[2]]
-      ind <- map(tau)
-      
-      # M-step
-      temp.M <- M.step(tau, N, Elz, J, OrdIndx, D, G, Y, CnsIndx, S2, model, a)
-      pi.vec <- temp.M[[1]]
-      mu <- temp.M[[2]]
-      lambda <- temp.M[[3]]
-      a <- temp.M[[4]]
-      Sigma <-temp.M[[5]]
-      
-      if(store.params==TRUE){
-        ind.store[, iter] <- ind
-        #       Ez.store[, , ,iter] <- Ez
-        tau.store[, , iter] <- tau
-        mu.store[, , iter] <- mu
-        lambda.store[, , iter] <- lambda
-        a.store[, , iter] <- a
-        if(J > OrdIndx) probs.nom.store[, , ,iter] <- probs.nom
-        likeStore[iter] <- ObsLogLikelihood(N, CnsIndx, G, Y, mu, Sigma, pi.vec, J, OrdIndx, K, perc.cut, Nnorms, zlimits, nom.ind.Z)
-      }
-    } # iter
-    
-    # approximated BIC
-    obslike <- ObsLogLikelihood(N, CnsIndx, G, Y, mu, Sigma, pi.vec, J, OrdIndx, K, perc.cut, Nnorms, zlimits, nom.ind.Z)
-    BIChat <- 2*obslike - npars_clustMD(model, D, G, J, OrdIndx)*log(N)
-    
-    if(store.params==TRUE){
-      params.store.list <- list(cl.store=ind.store, tau.store=tau.store, means.store=mu.store, A.store=a.store, lambda.store=lambda.store, likelihood.store=likeStore)
-      list(cl=ind, means=mu, A=a, Lambda=lambda, Sigma=Sigma, BIChat = BIChat, paramlist=params.store.list)
-    }else{
-      list(cl=ind, tau=tau, means=mu, A=a, Lambda=lambda, Sigma=Sigma, BIChat = BIChat)
-    }
-  }
+#' Model based clustering for mixed data: clustMD
+#'
+#' Model-based clustering of mixed data (i.e. data that consist of continuous,
+#' binary, ordinal or nominal variables) using a parsimonious mixture of latent
+#' Gaussian variable models.
+#' @aliases clustMD-package
+#' @author Damien McParland
+#' 
+#' Damien McParland <damien.mcparland@ucd.ie>
+#' Isobel Claire Gormley <claire.gormley@ucd.ie>
+#' 
+#' @references McParland, D. and Gormley, I.C. (2016). Model based clustering 
+#'     for mixed data: clustMD. Advances in Data Analysis and Classification, 
+#'     10 (2):155-169.
+#'
+#' @seealso \code{\link{clustMD}}
+#'
+#' @docType package
+#' @keywords package
+#' 
+"_PACKAGE"
+
+# ------------------------------------------------------------------- #
+
+#################
+### Data Sets ###
+#################
+
+#' Byar prostate cancer data set.
+#'
+#' A data set consisting of variables of mixed type measured on a group of
+#' prostate cancer patients. Patients have either stage 3 or stage 4 prostate
+#' cancer.
+#' 
+#' @format  A data frame with 475 observations on the following 15 variables.
+#' \describe{
+#'  \item{\code{Age}}{a numeric vector indicating the age of the patient.}
+#'  \item{\code{Weight}}{a numeric vector indicating the weight of the patient.}
+#'  \item{\code{Performance.rating}}{an ordinal variable indicating how active
+#'      the patient is: 0 - normal activity, 1 - in bed less than 50\% of 
+#'      daytime, 2 - in bed more than 50\% of daytime, 3 - confined to bed.}
+#'  \item{\code{Cardiovascular.disease.history}}{a binary variable indicating
+#'      if the patient has a history of cardiovascular disease: 0 - no, 1 - 
+#'      yes.}
+#'  \item{\code{Systolic.Blood.pressure}}{a numeric vector indicating the 
+#'      systolic blood pressure of the patient in units of ten.}
+#'  \item{\code{Diastolic.blood.pressure}}{a numeric vector indicating the 
+#'      diastolic blood pressure of the patient in units of ten.}
+#'  \item{\code{Electrocardiogram.code}}{a nominal variable indicating the 
+#'      electorcardiogram code: 0 - normal, 1 - benign, 2 - rythmic 
+#'      disturbances and electrolyte changes, 3 - heart blocks or conduction
+#'      defects, 4 - heart strain, 5 - old myocardial infarct, 6 - recent 
+#'      myocardial infarct.}
+#'  \item{\code{Serum.haemoglobin}}{a numeric vector indicating the serum
+#'      haemoglobin levels of the patient measured in g/100ml.}
+#'  \item{\code{Size.of.primary.tumour}}{a numeric vector indicating the 
+#'      estimated size of the patient's primary tumour in centimeters squared.}
+#'  \item{\code{Index.of.tumour.stage.and.histolic.grade}}{a numeric vector 
+#'      indicating the combined index of tumour stage and histolic grade of the
+#'      patient.}
+#'  \item{\code{Serum.prostatic.acid.phosphatase}}{a numeric vector indicating 
+#'      the serum prostatic acid phosphatase levels of the patient in 
+#'      King-Armstong units.}
+#'  \item{\code{Bone.metastases}}{a binary vector indicating the presence of 
+#'      bone metastasis: 0 - no, 1 - yes.}
+#'  \item{\code{Stage}}{the stage of the patient's prostate cancer.}
+#'  \item{\code{Observation}}{a patient ID number.}
+#'  \item{\code{SurvStat}}{the post trial survival status of the patient: 
+#'      0 - alive, 1 - dead from prostatic cancer, 2 - dead from heart or 
+#'      vascular disease, 3 - dead from cerebrovascular accident, 3 - dead form
+#'      pulmonary ebolus, 5 - dead from other cancer, 6 - dead from respiratory
+#'      disease, 7 - dead from other specific non-cancer cause, 8 - dead from 
+#'      other unspecified non-cancer cause, 9 - dead from unknown cause.}
+#'}
+#'
+#' @source Byar, D.P. and Green, S.B. (1980). The choice of treatment for 
+#'     cancer patients based on covariate information: applications to prostate
+#'     cancer. Bulletin du Cancer 67: 477-490.
+#'     
+#'     Hunt, L., Jorgensen, M. (1999). Mixture model clustering using the 
+#'     multimix program. Australia and New Zealand Journal of Statistics 41:
+#'     153-171.
+#'
+#' @keywords datasets
+#' 
+"Byar"
