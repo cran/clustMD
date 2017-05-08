@@ -26,4 +26,3 @@ Calculates the threshold parameters for ordinal variables.
 \code{\link{clustMD}}
 }
 \keyword{internal}
-

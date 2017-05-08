@@ -18,4 +18,3 @@ elements of that vector. Calculations are done on the log scale for
 stability.
 }
 \keyword{internal}
-

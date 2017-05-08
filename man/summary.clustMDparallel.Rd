@@ -26,4 +26,3 @@ model.
 \code{\link{clustMD}}
 }
 \keyword{print}
-

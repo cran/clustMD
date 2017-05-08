@@ -2,19 +2,13 @@
 % Please edit documentation in R/clustMD.R
 \docType{package}
 \name{clustMD-package}
-\alias{_PACKAGE}
 \alias{clustMD-package}
+\alias{_PACKAGE}
 \title{Model based clustering for mixed data: clustMD}
 \description{
 Model-based clustering of mixed data (i.e. data that consist of continuous,
 binary, ordinal or nominal variables) using a parsimonious mixture of latent
 Gaussian variable models.
-}
-\author{
-Damien McParland
-
-Damien McParland <damien.mcparland@ucd.ie>
-Isobel Claire Gormley <claire.gormley@ucd.ie>
 }
 \references{
 McParland, D. and Gormley, I.C. (2016). Model based clustering 
@@ -24,5 +18,10 @@ McParland, D. and Gormley, I.C. (2016). Model based clustering
 \seealso{
 \code{\link{clustMD}}
 }
-\keyword{package}
+\author{
+Damien McParland
 
+Damien McParland <damien.mcparland@ucd.ie>
+Isobel Claire Gormley <claire.gormley@ucd.ie>
+}
+\keyword{package}

@@ -44,4 +44,3 @@ Wegman, E. J. (1990) Hyperdimensional data analysis using
 }
 \keyword{device}
 \keyword{internal}
-

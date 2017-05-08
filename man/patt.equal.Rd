@@ -23,4 +23,3 @@ or \code{FALSE} reprectively.
 Used internally in clustMD function.
 }
 \keyword{internal}
-

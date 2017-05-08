@@ -23,4 +23,3 @@ BIC.
 \code{\link{clustMD}}
 }
 \keyword{print}
-

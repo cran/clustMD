@@ -16,4 +16,3 @@ Returns the outer product of the vector \code{x} with itself.
 This function calculates the outer product of a vector with itself.
 }
 \keyword{internal}
-

@@ -97,8 +97,8 @@ z.moments <- function(D, G, N, CnsIndx, OrdIndx, zlimits, mu, Sigma, Y, J,
   # continuous
   if (CnsIndx > 0) {
       Ez.new[, 1:CnsIndx, 1:G] <- Y[, 1:CnsIndx]
-      for (g in 1:G) S.new[1:CnsIndx, 1:CnsIndx, g, ] <- apply(Y[, 1:CnsIndx], 
-        1, vec.outer)
+      for (g in 1:G) S.new[1:CnsIndx, 1:CnsIndx, g, ] <- 
+          apply(matrix(Y[, 1:CnsIndx], nrow = N), 1, vec.outer)
   }  # if
   
   for (g in 1:G) {
@@ -201,7 +201,8 @@ z.moments_diag <- function(D, G, N, CnsIndx, OrdIndx, zlimits, mu, Sigma,
                                         mean = mu[(CnsIndx + 1):OrdIndx, g],
                                         sd = sqrt(diag(Sigma[, , g])[(CnsIndx + 1):OrdIndx]))
         
-        S2.new[(CnsIndx + 1):OrdIndx, (CnsIndx + 1):OrdIndx, g, i] <- diag(temp.v + temp.e^2) 
+        S2.new[(CnsIndx + 1):OrdIndx, (CnsIndx + 1):OrdIndx, g, i] <- diag(temp.v + temp.e^2,
+                                                                           nrow=OrdIndx-CnsIndx) 
       }  # i
     }  # if
     
@@ -614,8 +615,9 @@ M.step <- function(tau, N, sumTauEz, J, OrdIndx, D, G, Y, CnsIndx, sumTauS,
     # Lambda (Continuous & Ordinal)
     if (OrdIndx > 0) {
       lambda.new_A <- 
-        -2 * sum(diag(t(sumTauEz[1:OrdIndx, ]) %*% mu.new[1:OrdIndx, ])) +
-        t(diag(t(mu.new[1:OrdIndx, ]) %*% mu.new[1:OrdIndx, ])) %*% tausum
+        -2 * sum(diag(t(matrix(sumTauEz[1:OrdIndx, ], nrow=OrdIndx)) %*% 
+                        matrix(mu.new[1:OrdIndx, ], nrow=OrdIndx))) +
+        t(diag(t(matrix(mu.new[1:OrdIndx, ], nrow=OrdIndx)) %*% mu.new[1:OrdIndx, ])) %*% tausum
       if (CnsIndx > 0) 
         lambda.new_A <- lambda.new_A + sum(diag(Y[, 1:CnsIndx] %*% t(Y[, 1:CnsIndx])))
       if (OrdIndx > CnsIndx) 
@@ -648,7 +650,7 @@ M.step <- function(tau, N, sumTauEz, J, OrdIndx, D, G, Y, CnsIndx, sumTauS,
         
         if (CnsIndx > 0) 
           lambda.new_A[g] <- lambda.new_A[g] + 
-            sum(diag(tau[, g] * Y[, 1:CnsIndx] %*% t(Y[, 1:CnsIndx])))
+            sum(diag(tau[, g] * matrix(Y[, 1:CnsIndx], ncol=CnsIndx) %*% t(matrix(Y[, 1:CnsIndx], ncol=CnsIndx))))
         
         if (OrdIndx > CnsIndx) 
           lambda.new_A[g] <- lambda.new_A[g] + 
@@ -690,10 +692,10 @@ M.step <- function(tau, N, sumTauEz, J, OrdIndx, D, G, Y, CnsIndx, sumTauS,
     # lambda (continuous & ordinal)
     if (OrdIndx > 0) {
       lambda.new_A <- -2 *
-        sum(diag(t(sumTauEz[1:OrdIndx, ]) %*% diag(1/a[1, 1:OrdIndx]) %*% 
-                   mu.new[1:OrdIndx, ])) +
-        sum(diag(t(mu.new[1:OrdIndx, ]) %*% diag(1/a[1, 1:OrdIndx]) %*%
-                   mu.new[1:OrdIndx, ]) * tausum)
+        sum(diag(t(matrix(sumTauEz[1:OrdIndx, ], nrow = OrdIndx)) %*% diag(1/a[1, 1:OrdIndx]) %*% 
+                   matrix(mu.new[1:OrdIndx, ], nrow = OrdIndx))) +
+        sum(diag(t(matrix(mu.new[1:OrdIndx, ], nrow = OrdIndx)) %*% diag(1/a[1, 1:OrdIndx]) %*%
+                   matrix(mu.new[1:OrdIndx, ], nrow = OrdIndx)) * tausum)
       
       if (CnsIndx > 0) 
         lambda.new_A <- lambda.new_A + 
@@ -727,7 +729,7 @@ M.step <- function(tau, N, sumTauEz, J, OrdIndx, D, G, Y, CnsIndx, sumTauS,
       a.new[(OrdIndx + 1):D] <- 1
     
     a.new <- matrix(a.new, G, D, byrow = TRUE)
-    Sigma.new <- array(diag(lambda.new[1, ] * a.new[1, ]), c(D, D, G))
+    Sigma.new <- array(diag(lambda.new[1, ] * a.new[1, ], nrow = D, ncol = D), c(D, D, G))
     
   } else if (model == "VEI") {
     
@@ -737,23 +739,27 @@ M.step <- function(tau, N, sumTauEz, J, OrdIndx, D, G, Y, CnsIndx, sumTauS,
     # lambda (continuous & ordinal)
     if (OrdIndx > 0) {
       lambda.new_A <- -2 * 
-        diag(t(sumTauEz[1:OrdIndx, ]) %*% diag(1/a[1, 1:OrdIndx]) %*% mu.new[1:OrdIndx, ]) +
-        (t(1/a[1, 1:OrdIndx]) %*% {mu.new[1:OrdIndx, ]^2}) * tausum
+        diag(t(matrix(sumTauEz[1:OrdIndx, ], nrow = OrdIndx)) %*% diag(1/a[1, 1:OrdIndx]) %*% matrix(mu.new[1:OrdIndx, ], nrow=OrdIndx)) +
+        (t(1/a[1, 1:OrdIndx]) %*% matrix(mu.new[1:OrdIndx, ]^2, nrow = OrdIndx)) * tausum
       if (CnsIndx > 0) 
-        lambda.new_A <- lambda.new_A + t((Y[, 1:CnsIndx]^2) %*% (1/a[1, 1:CnsIndx])) %*% tau
+        lambda.new_A <- lambda.new_A + t(matrix(Y[, 1:CnsIndx]^2, ncol = CnsIndx) %*% 
+                                           matrix(1/a[1, 1:CnsIndx], nrow = CnsIndx)) %*% tau
       if (OrdIndx > CnsIndx) 
         lambda.new_A <- lambda.new_A + (1/a[1, (CnsIndx + 1):OrdIndx]) %*% 
-          apply(sumTauS, 3, diag)[(CnsIndx + 1):OrdIndx, ]
+          matrix(apply(sumTauS, 3, diag)[(CnsIndx + 1):OrdIndx, ], nrow = OrdIndx - CnsIndx)
       lambda.new[, 1:OrdIndx] <- lambda.new_A/{OrdIndx * tausum}
     }
     
     # lambda (nominal)
     if (J > OrdIndx) {
       lambda.new_B <- -2 * 
-        diag(t(sumTauEz[(OrdIndx + 1):D, ]) %*% diag(1/a[1, (OrdIndx + 1):D]) %*%
-               mu.new[(OrdIndx + 1):D, ]) + 
-        (t(1/a[1, (OrdIndx + 1):D]) %*% {mu.new[(OrdIndx + 1):D, ]^2}) * tausum +
-        (1/a[1, (OrdIndx + 1):D]) %*% apply(sumTauS, 3, diag)[(OrdIndx + 1):D, ]
+        diag(t(matrix(sumTauEz[(OrdIndx + 1):D, ], nrow = D - OrdIndx)) %*%
+               diag(1/a[1, (OrdIndx + 1):D]) %*%
+               matrix(mu.new[(OrdIndx + 1):D, ], nrow=D-OrdIndx)) + 
+        (t(1/a[1, (OrdIndx + 1):D]) %*% matrix(mu.new[(OrdIndx + 1):D, ]^2,
+                                               nrow = D - OrdIndx)) * tausum +
+        (1/a[1, (OrdIndx + 1):D]) %*% matrix(apply(sumTauS, 3, diag)[(OrdIndx + 1):D, ],
+                                             nrow=D - OrdIndx)
       
       lambda.new_B <- lambda.new_B/{(D - OrdIndx) * tausum}
       lambda.new[, (OrdIndx + 1):D] <- lambda.new_B/sum(lambda.new_B)
@@ -765,12 +771,12 @@ M.step <- function(tau, N, sumTauEz, J, OrdIndx, D, G, Y, CnsIndx, sumTauS,
     
     if (CnsIndx > 0) 
       a.new[1:CnsIndx] <- a.new[1:CnsIndx] + (1/lambda.new[, 1]) %*% t(tau) %*%
-        (Y[, 1:CnsIndx]^2)
+        matrix(Y[, 1:CnsIndx]^2, ncol = CnsIndx)
     
     if (J > CnsIndx) 
       a.new[(CnsIndx + 1):D] <- a.new[(CnsIndx + 1):D] +
         diag(matrix(apply(sumTauS, 3, diag)[(CnsIndx + 1):D, ], nrow = D - CnsIndx, ncol = G) %*%
-               (1/lambda.new[, (CnsIndx + 1):D]))
+               matrix(1/lambda.new[, (CnsIndx + 1):D], ncol = D - CnsIndx))
     
     a.new <- a.new/N
     # det(A) = 1 constraint
@@ -783,7 +789,7 @@ M.step <- function(tau, N, sumTauEz, J, OrdIndx, D, G, Y, CnsIndx, sumTauS,
     
     a.new <- matrix(a.new, G, D, byrow = TRUE)
     Sigma.new <- array(NA, c(D, D, G))
-    for (g in 1:G) Sigma.new[, , g] <-  diag(lambda.new[g, ] * a.new[1, ])
+    for (g in 1:G) Sigma.new[, , g] <-  diag(lambda.new[g, ] * a.new[1, ], nrow = D, ncol = D)
     
   } else if (model == "EVI") {
     
@@ -793,7 +799,7 @@ M.step <- function(tau, N, sumTauEz, J, OrdIndx, D, G, Y, CnsIndx, sumTauS,
     # lambda (continuous & ordinal)
     if (OrdIndx > 0) {
       lambda.new_A <- -2 * 
-        sum(sumTauEz[1:OrdIndx, ] * matrix(mu.new[1:OrdIndx, ]/t(a[, 1:OrdIndx]), OrdIndx, G)) +
+        sum(matrix(sumTauEz[1:OrdIndx, ], nrow = OrdIndx) * matrix(mu.new[1:OrdIndx, ]/t(a[, 1:OrdIndx]), OrdIndx, G)) +
         diag(t(mu.new[1:OrdIndx, ]^2) %*% (1/t(matrix(a[, 1:OrdIndx], G, OrdIndx)))) %*% tausum
       
       if (CnsIndx > 0) 
@@ -802,8 +808,9 @@ M.step <- function(tau, N, sumTauEz, J, OrdIndx, D, G, Y, CnsIndx, sumTauS,
       
       if (OrdIndx > CnsIndx) 
         lambda.new_A <- lambda.new_A +
-          sum(diag(t(apply(sumTauS, 3, diag)[(CnsIndx + 1):OrdIndx, ]) %*%
-                     t(matrix(1 / a[, (CnsIndx + 1):OrdIndx], G, OrdIndx - CnsIndx))))
+          sum(diag(t(matrix(apply(sumTauS, 3, diag)[(CnsIndx + 1):OrdIndx, ],
+                            nrow = OrdIndx-CnsIndx)) %*%
+                     t(matrix(1 / a[, (CnsIndx + 1):OrdIndx], nrow = G, ncol = OrdIndx - CnsIndx))))
       
       lambda.new_A <- lambda.new_A / {OrdIndx * N}
       lambda.new[, 1:OrdIndx] <- lambda.new_A
@@ -844,17 +851,19 @@ M.step <- function(tau, N, sumTauEz, J, OrdIndx, D, G, Y, CnsIndx, sumTauS,
     # lambda (continuous & ordinal)
     if (OrdIndx > 0) {
       lambda.new_A <- -2 * 
-        diag(t(sumTauEz[1:OrdIndx, ]) %*% 
+        diag(t(matrix(sumTauEz[1:OrdIndx, ], nrow=OrdIndx)) %*% 
                matrix(mu.new[1:OrdIndx, ]/t(a[, 1:OrdIndx]), OrdIndx, G)) +
-        diag(t(mu.new[1:OrdIndx, ]^2) %*% (1/t(matrix(a[, 1:OrdIndx], G, OrdIndx)))) * tausum
+        diag(t(matrix(mu.new[1:OrdIndx, ]^2, nrow=OrdIndx)) %*%
+               (1/t(matrix(a[, 1:OrdIndx], G, OrdIndx)))) * tausum
       
       if (CnsIndx > 0) 
-        lambda.new_A <- lambda.new_A + diag(t(tau) %*% (Y[, 1:CnsIndx]^2) %*%
+        lambda.new_A <- lambda.new_A + diag(t(tau) %*% matrix(Y[, 1:CnsIndx]^2, ncol = CnsIndx) %*%
                                               (t(matrix(1/a[, 1:CnsIndx], G, CnsIndx))))
       if (OrdIndx > CnsIndx) 
         lambda.new_A <- lambda.new_A + 
-          diag(t(apply(sumTauS, 3, diag)[(CnsIndx + 1):OrdIndx, ]) %*%
-                 t(matrix(1/a[, (CnsIndx + 1):OrdIndx], G, OrdIndx - CnsIndx)))
+          diag(t(matrix(apply(sumTauS, 3, diag)[(CnsIndx + 1):OrdIndx, ],
+                        nrow = OrdIndx - CnsIndx)) %*% t(matrix(1/a[, (CnsIndx + 1):OrdIndx],
+                                                                nrow = G, ncol = OrdIndx - CnsIndx)))
       
       lambda.new_A <- lambda.new_A / {OrdIndx * tausum}
       lambda.new[, 1:OrdIndx] <- lambda.new_A
@@ -878,7 +887,7 @@ M.step <- function(tau, N, sumTauEz, J, OrdIndx, D, G, Y, CnsIndx, sumTauS,
     a.new <- t(-2 * sumTauEz * mu.new + sweep(mu.new^2, 2, tausum, "*"))
     
     if (CnsIndx > 0) 
-      a.new[, 1:CnsIndx] <- a.new[, 1:CnsIndx] + t(tau) %*% (Y[, 1:CnsIndx]^2)
+      a.new[, 1:CnsIndx] <- a.new[, 1:CnsIndx] + t(tau) %*% matrix(Y[, 1:CnsIndx]^2, ncol = CnsIndx)
     
     if (J > CnsIndx) 
       a.new[, (CnsIndx + 1):D] <- a.new[, (CnsIndx + 1):D] +

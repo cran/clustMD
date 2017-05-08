@@ -21,4 +21,3 @@ according to this criteria, a parallel coordinates plot of the cluster means
 is produced along with a barchart or heatmap of the covariance matrices for
 each cluster and a histogram of the clustering uncertainties.
 }
-

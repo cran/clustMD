@@ -52,4 +52,3 @@ Approximates the observed log likelihood.
 \code{\link{clustMD}}
 }
 \keyword{internal}
-

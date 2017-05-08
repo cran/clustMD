@@ -60,4 +60,3 @@ McParland, D. and Gormley, I.C. (2016). Model based clustering
 \seealso{
 \code{\link{clustMD}}
 }
-

@@ -1,6 +1,6 @@
 Package: clustMD
 Title: Model Based Clustering for Mixed Data
-Version: 1.2
+Version: 1.2.1
 Authors@R: c( person("Damien", "McParland", email="damien.mcparland@ucd.ie",
     role=c("aut", "cre")), person("Isobel Claire", "Gormley",
     email="claire.gormley@ucd.ie", role=c("aut")))
@@ -12,11 +12,11 @@ Imports: ggplot2, mclust, reshape2, MASS, msm, mvtnorm, parallel,
         truncnorm, viridis, stats
 License: GPL-2
 LazyData: true
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 NeedsCompilation: no
-Packaged: 2017-04-03 10:10:29 UTC; damien
+Packaged: 2017-05-08 16:35:03 UTC; damien
 Author: Damien McParland [aut, cre],
   Isobel Claire Gormley [aut]
 Maintainer: Damien McParland <damien.mcparland@ucd.ie>
 Repository: CRAN
-Date/Publication: 2017-04-03 15:31:02 UTC
+Date/Publication: 2017-05-08 17:19:20 UTC

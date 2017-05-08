@@ -131,4 +131,3 @@ McParland, D. and Gormley, I.C. (2016). Model based clustering
     for mixed data: clustMD. Advances in Data Analysis and Classification,
     10 (2):155-169.
 }
-

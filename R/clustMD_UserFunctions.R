@@ -83,6 +83,7 @@
 #' @export
 #' 
 #' @importFrom mclust hcVVV
+#' @importFrom mclust mclustBIC
 #' @import utils
 #' @import stats
 #' 
@@ -152,12 +153,17 @@ clustMD <- function(X, G, CnsIndx, OrdIndx, Nnorms, MaxIter, model,
   }  # if
   
   if ( (model == "BD")&(OrdIndx > CnsIndx) ){
-    patt.tab <- data.frame(table(data.frame((Y[, (CnsIndx + 1):OrdIndx]))))
-    patt.tab <- patt.tab[patt.tab$Freq != 0, 1:(OrdIndx - CnsIndx)]
-    patt.indx <- list()
-    for (p in 1:nrow(patt.tab)) {
-      patt.indx[[p]] <- which(apply(Y[, (CnsIndx + 1):OrdIndx], 1, patt.equal, patt.tab[p, ]))
-    } # p
+    if((OrdIndx-CnsIndx)==1){
+      patt.indx <- list()
+      for(p in 1:max(Y[, OrdIndx])) {patt.indx[[p]] <- which(Y[, OrdIndx]==p)}
+    }else{
+      patt.tab <- data.frame(table(data.frame((Y[, (CnsIndx + 1):OrdIndx]))))
+      patt.tab <- patt.tab[patt.tab$Freq != 0, 1:(OrdIndx - CnsIndx)]
+      patt.indx <- list()
+      for (p in 1:nrow(patt.tab)) {
+        patt.indx[[p]] <- which(apply(Y[, (CnsIndx + 1):OrdIndx], 1, patt.equal, patt.tab[p, ]))
+      } # p
+    }
   } # if
   
   
@@ -274,9 +280,17 @@ clustMD <- function(X, G, CnsIndx, OrdIndx, Nnorms, MaxIter, model,
     
   } else if (startCL == "mclust") {
     if (CnsIndx > 0) {
-      ind <- mclust::Mclust(Y[, 1:CnsIndx], G, "VVV")$cl
+      if(CnsIndx==1){
+        ind <- mclust::Mclust(Y[, 1:CnsIndx], G, "V")$cl
+      } else {
+        ind <- mclust::Mclust(Y[, 1:CnsIndx], G, "VVV")$cl
+      } # ifelse
     } else {
-      ind <- mclust::Mclust(Y, G, "VVV")$cl
+      if(J==1){
+        ind <- mclust::Mclust(Y, G, "V")$cl
+      } else {
+        ind <- mclust::Mclust(Y, G, "VVV")$cl
+      } # ifelse
     }
     
   } else if (startCL == "random") {
@@ -427,7 +441,8 @@ clustMD <- function(X, G, CnsIndx, OrdIndx, Nnorms, MaxIter, model,
   CompleteLike_i <- rep(NA, N)
   for(i in 1:N){
     CompleteLike_i[i] <- log(pi.vec[ind[i]]) +
-      mvtnorm::dmvnorm(Ez[i, , ind[i]], mean=mu[, ind[i]], sigma=Sigma[, , ind[i]], log = TRUE)
+      mvtnorm::dmvnorm(Ez[i, , ind[i]], mean=mu[, ind[i]], 
+                       sigma=matrix(Sigma[, , ind[i]], nrow = D, ncol = D), log = TRUE)
   }
   
   ICLhat <- 2*sum(CompleteLike_i) - npars_clustMD(model, D, G, J, CnsIndx, OrdIndx, K) * log(N)

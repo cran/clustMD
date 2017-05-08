@@ -23,4 +23,3 @@ and a covariance model as inputs. It then returns the output corresponding
 to that model. If the particular model is not contained in the 
 \code{clustMDparallel} object then the function returns an error.
 }
-

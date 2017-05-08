@@ -17,4 +17,3 @@ The mode of the sample. In the case of a tie, the minimum is
 Calculate the mode of a sample
 }
 \keyword{internal}
-

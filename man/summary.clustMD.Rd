@@ -24,4 +24,3 @@ a matrix of the cluster means.
 \code{\link{clustMD}}
 }
 \keyword{print}
-

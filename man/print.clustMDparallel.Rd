@@ -24,4 +24,3 @@ criterion.
 \code{\link{clustMD}}
 }
 \keyword{print}
-
