@@ -4,8 +4,21 @@
 \alias{M.step}
 \title{M-step of the (MC)EM algorithm}
 \usage{
-M.step(tau, N, sumTauEz, J, OrdIndx, D, G, Y, CnsIndx, sumTauS, model, a,
-  nom.ind.Z)
+M.step(
+  tau,
+  N,
+  sumTauEz,
+  J,
+  OrdIndx,
+  D,
+  G,
+  Y,
+  CnsIndx,
+  sumTauS,
+  model,
+  a,
+  nom.ind.Z
+)
 }
 \arguments{
 \item{tau}{a \code{N x G} matrix of cluster membership probabilities.}

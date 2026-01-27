@@ -4,8 +4,21 @@
 \alias{z.moments_diag}
 \title{Calculates the first and second moments of the latent data for diagonal models}
 \usage{
-z.moments_diag(D, G, N, CnsIndx, OrdIndx, zlimits, mu, Sigma, Y, J, K, norms,
-  nom.ind.Z)
+z.moments_diag(
+  D,
+  G,
+  N,
+  CnsIndx,
+  OrdIndx,
+  zlimits,
+  mu,
+  Sigma,
+  Y,
+  J,
+  K,
+  norms,
+  nom.ind.Z
+)
 }
 \arguments{
 \item{D}{dimension of the latent data.}

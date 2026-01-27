@@ -3,7 +3,6 @@
 \docType{package}
 \name{clustMD-package}
 \alias{clustMD-package}
-\alias{_PACKAGE}
 \title{Model based clustering for mixed data: clustMD}
 \description{
 Model-based clustering of mixed data (i.e. data that consist of continuous,

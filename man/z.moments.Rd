@@ -4,8 +4,22 @@
 \alias{z.moments}
 \title{Calculates the first and second moments of the latent data}
 \usage{
-z.moments(D, G, N, CnsIndx, OrdIndx, zlimits, mu, Sigma, Y, J, K, norms,
-  nom.ind.Z, patt.indx)
+z.moments(
+  D,
+  G,
+  N,
+  CnsIndx,
+  OrdIndx,
+  zlimits,
+  mu,
+  Sigma,
+  Y,
+  J,
+  K,
+  norms,
+  nom.ind.Z,
+  patt.indx
+)
 }
 \arguments{
 \item{D}{dimension of the latent data.}

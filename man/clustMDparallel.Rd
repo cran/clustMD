@@ -4,9 +4,22 @@
 \alias{clustMDparallel}
 \title{Run multiple clustMD models in parallel}
 \usage{
-clustMDparallel(X, CnsIndx, OrdIndx, G, models, Nnorms, MaxIter, store.params,
-  scale, startCL = "hc_mclust", Ncores = NULL, autoStop = FALSE,
-  ma.band = 50, stop.tol = NA)
+clustMDparallel(
+  X,
+  CnsIndx,
+  OrdIndx,
+  G,
+  models,
+  Nnorms,
+  MaxIter,
+  store.params,
+  scale,
+  startCL = "hc_mclust",
+  Ncores = NULL,
+  autoStop = FALSE,
+  ma.band = 50,
+  stop.tol = NA
+)
 }
 \arguments{
 \item{X}{a data matrix where the variables are ordered so that the 

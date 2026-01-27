@@ -4,9 +4,21 @@
 \alias{clustMD}
 \title{Model Based Clustering for Mixed Data}
 \usage{
-clustMD(X, G, CnsIndx, OrdIndx, Nnorms, MaxIter, model, store.params = FALSE,
-  scale = FALSE, startCL = "hc_mclust", autoStop = FALSE, ma.band = 50,
-  stop.tol = NA)
+clustMD(
+  X,
+  G,
+  CnsIndx,
+  OrdIndx,
+  Nnorms,
+  MaxIter,
+  model,
+  store.params = FALSE,
+  scale = FALSE,
+  startCL = "hc_mclust",
+  autoStop = FALSE,
+  ma.band = 50,
+  stop.tol = NA
+)
 }
 \arguments{
 \item{X}{a data matrix where the variables are ordered so that the 

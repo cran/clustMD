@@ -4,8 +4,25 @@
 \alias{E.step}
 \title{E-step of the (MC)EM algorithm}
 \usage{
-E.step(N, G, D, CnsIndx, OrdIndx, zlimits, mu, Sigma, Y, J, K, norms, nom.ind.Z,
-  patt.indx, pi.vec, model, perc.cut)
+E.step(
+  N,
+  G,
+  D,
+  CnsIndx,
+  OrdIndx,
+  zlimits,
+  mu,
+  Sigma,
+  Y,
+  J,
+  K,
+  norms,
+  nom.ind.Z,
+  patt.indx,
+  pi.vec,
+  model,
+  perc.cut
+)
 }
 \arguments{
 \item{N}{number of observations.}

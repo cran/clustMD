@@ -4,8 +4,23 @@
 \alias{ObsLogLikelihood}
 \title{Approximates the observed log likelihood.}
 \usage{
-ObsLogLikelihood(N, CnsIndx, G, Y, mu, Sigma, pi.vec, patt.indx, zlimits, J,
-  OrdIndx, probs.nom, model, perc.cut, K)
+ObsLogLikelihood(
+  N,
+  CnsIndx,
+  G,
+  Y,
+  mu,
+  Sigma,
+  pi.vec,
+  patt.indx,
+  zlimits,
+  J,
+  OrdIndx,
+  probs.nom,
+  model,
+  perc.cut,
+  K
+)
 }
 \arguments{
 \item{N}{the number of observations.}

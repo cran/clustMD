@@ -4,8 +4,16 @@
 \alias{clustMDparcoord}
 \title{Parallel coordinates plot adapted for \code{clustMD} output}
 \usage{
-clustMDparcoord(x, col = 1, xlabels = NULL, lty = 1, var.label = FALSE,
-  xlab = "", ylab = "", ...)
+clustMDparcoord(
+  x,
+  col = 1,
+  xlabels = NULL,
+  lty = 1,
+  var.label = FALSE,
+  xlab = "",
+  ylab = "",
+  ...
+)
 }
 \arguments{
 \item{x}{a matrix or data frame who columns represent variables. Missing 

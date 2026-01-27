@@ -206,7 +206,7 @@ qfun <- function(a, b, S) {
 #' multivariate normal distribution. It takes as inputs a vector of lower 
 #' thresholds and another of upper thresholds along with the mean and 
 #' covariance matrix of the untruncated distribution. This function follows
-#' the method proposed by Kan \& Robotti (2016).
+#' the method proposed by Kan & Robotti (2016).
 #'
 #' @param a a vector of lower thresholds.
 #' @param b a vector of upper thresholds.

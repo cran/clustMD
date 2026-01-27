@@ -4,7 +4,8 @@
 \name{Byar}
 \alias{Byar}
 \title{Byar prostate cancer data set.}
-\format{A data frame with 475 observations on the following 15 variables.
+\format{
+A data frame with 475 observations on the following 15 variables.
 \describe{
  \item{\code{Age}}{a numeric vector indicating the age of the patient.}
  \item{\code{Weight}}{a numeric vector indicating the weight of the patient.}
@@ -43,7 +44,8 @@
      pulmonary ebolus, 5 - dead from other cancer, 6 - dead from respiratory
      disease, 7 - dead from other specific non-cancer cause, 8 - dead from 
      other unspecified non-cancer cause, 9 - dead from unknown cause.}
-}}
+}
+}
 \source{
 Byar, D.P. and Green, S.B. (1980). The choice of treatment for 
     cancer patients based on covariate information: applications to prostate

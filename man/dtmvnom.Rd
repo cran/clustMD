@@ -27,7 +27,7 @@ This function returns the mean and covariance matrix of a truncated
 multivariate normal distribution. It takes as inputs a vector of lower 
 thresholds and another of upper thresholds along with the mean and 
 covariance matrix of the untruncated distribution. This function follows
-the method proposed by Kan \& Robotti (2016).
+the method proposed by Kan & Robotti (2016).
 }
 \references{
 Kan, R., & Robotti, C. (2016). On Moments of Folded and 
